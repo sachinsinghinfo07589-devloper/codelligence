@@ -1,0 +1,179 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum UserRole {
+  GUEST
+  USER
+  BUSINESS_OWNER
+  MODERATOR
+  ADMIN
+}
+
+enum ListingType {
+  BUSINESS
+  PRODUCT
+  SERVICE
+  EVENT
+  COURSE
+  INTERNSHIP
+}
+
+enum ListingStatus {
+  DRAFT
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+  SUSPENDED
+  EXPIRED
+}
+
+enum ReportStatus {
+  OPEN
+  RESOLVED
+  DISMISSED
+}
+
+model User {
+  id           String        @id @default(uuid())
+  email        String        @unique
+  passwordHash String
+  name         String
+  role         UserRole      @default(USER)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  businesses   Business[]
+  reports      Report[]
+  auditLogs    AuditLog[]
+  sessions     UserSession[]
+
+  @@map("users")
+}
+
+model UserSession {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refreshToken String   @unique
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  @@map("user_sessions")
+}
+
+model Business {
+  id                  String    @id @default(uuid())
+  userId              String
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name                String
+  logoUrl             String?
+  shortDescription    String
+  category            String
+  websiteUrl          String?
+  publicEmail         String?
+  publicPhone         String?
+  city                String?
+  state               String?
+  linkedinUrl         String?
+  twitterUrl          String?
+  isVerified          Boolean   @default(false)
+  verificationNote    String?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  listings            Listing[]
+
+  @@map("businesses")
+}
+
+model Category {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String
+  iconName    String
+  createdAt   DateTime @default(now())
+
+  @@map("categories")
+}
+
+model Listing {
+  id                 String             @id @default(uuid())
+  businessId         String
+  business           Business           @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  title              String
+  description        String
+  category           String
+  listingType        ListingType
+  imageUrl           String?
+  destinationUrl     String?
+  city               String?
+  state              String?
+  isOnlineAvailable  Boolean            @default(true)
+  contactEmail       String?
+  contactPhone       String?
+  status             ListingStatus      @default(PENDING_REVIEW)
+  rejectionReason    String?
+  validityDays       Int                @default(60)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  expiresAt          DateTime
+  viewCount          Int                @default(0)
+  clickCount         Int                @default(0)
+  reports            Report[]
+  moderationActions  ModerationAction[]
+
+  @@index([status, expiresAt])
+  @@index([category])
+  @@map("listings")
+}
+
+model Report {
+  id             String       @id @default(uuid())
+  listingId      String
+  listing        Listing      @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  reporterId     String
+  reporter       User         @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+  reason         String
+  details        String
+  status         ReportStatus @default(OPEN)
+  createdAt      DateTime     @default(now())
+
+  @@map("reports")
+}
+
+model ModerationAction {
+  id          String   @id @default(uuid())
+  listingId   String
+  listing     Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  moderatorId String
+  action      String
+  reason      String?
+  timestamp   DateTime @default(now())
+
+  @@map("moderation_actions")
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  actorId    String
+  actor      User     @relation(fields: [actorId], references: [id], onDelete: Cascade)
+  action     String
+  targetType String
+  targetId   String
+  details    String
+  timestamp  DateTime @default(now())
+
+  @@map("audit_logs")
+}
+
+model AppSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+
+  @@map("app_settings")
+}

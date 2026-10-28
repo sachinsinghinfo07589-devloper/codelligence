@@ -1,0 +1,6 @@
+{
+  "name": "Codelligence Ads",
+  "description": "Zero-budget free business promotional listings, verified internships, and community discovery platform by Codelligence Technologies.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

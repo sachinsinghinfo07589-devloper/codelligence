@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: codelligence_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: codelligence_user
+      POSTGRES_PASSWORD: codelligence_password
+      POSTGRES_DB: codelligence_ads
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U codelligence_user -d codelligence_ads"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: codelligence_backend
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PORT: 4000
+      DATABASE_URL: postgresql://codelligence_user:codelligence_password@postgres:5432/codelligence_ads?schema=public
+      JWT_SECRET: your_production_jwt_secret_token_change_in_env
+      JWT_REFRESH_SECRET: your_production_jwt_refresh_secret
+      FRONTEND_URL: http://localhost:3000
+      NODE_ENV: development
+    ports:
+      - "4000:4000"
+
+  admin-web:
+    build:
+      context: ./admin-web
+      dockerfile: Dockerfile
+    container_name: codelligence_admin_web
+    restart: always
+    depends_on:
+      - backend
+    environment:
+      VITE_API_URL: http://localhost:4000
+    ports:
+      - "3000:3000"
+
+volumes:
+  postgres_data:

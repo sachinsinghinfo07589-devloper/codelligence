@@ -1,0 +1,68 @@
+{
+  "entities": {
+    "User": {
+      "collection": "users",
+      "fields": {
+        "id": { "type": "string", "required": true },
+        "name": { "type": "string", "required": true },
+        "email": { "type": "string", "required": true },
+        "role": { "type": "string", "required": true },
+        "createdAt": { "type": "timestamp", "required": true }
+      }
+    },
+    "Business": {
+      "collection": "businesses",
+      "fields": {
+        "id": { "type": "string", "required": true },
+        "userId": { "type": "string", "required": true },
+        "name": { "type": "string", "required": true },
+        "shortDescription": { "type": "string", "required": true },
+        "category": { "type": "string", "required": true },
+        "websiteUrl": { "type": "string", "required": false },
+        "publicEmail": { "type": "string", "required": false },
+        "publicPhone": { "type": "string", "required": false },
+        "city": { "type": "string", "required": false },
+        "state": { "type": "string", "required": false },
+        "isVerified": { "type": "boolean", "required": true },
+        "createdAt": { "type": "timestamp", "required": true }
+      }
+    },
+    "Listing": {
+      "collection": "listings",
+      "fields": {
+        "id": { "type": "string", "required": true },
+        "businessId": { "type": "string", "required": true },
+        "businessName": { "type": "string", "required": true },
+        "title": { "type": "string", "required": true },
+        "description": { "type": "string", "required": true },
+        "category": { "type": "string", "required": true },
+        "listingType": { "type": "string", "required": true },
+        "destinationUrl": { "type": "string", "required": false },
+        "city": { "type": "string", "required": false },
+        "state": { "type": "string", "required": false },
+        "isOnlineAvailable": { "type": "boolean", "required": true },
+        "contactEmail": { "type": "string", "required": false },
+        "contactPhone": { "type": "string", "required": false },
+        "status": { "type": "string", "required": true },
+        "rejectionReason": { "type": "string", "required": false },
+        "validityDays": { "type": "number", "required": true },
+        "createdAt": { "type": "timestamp", "required": true },
+        "expiresAt": { "type": "timestamp", "required": true }
+      }
+    },
+    "Report": {
+      "collection": "reports",
+      "fields": {
+        "id": { "type": "string", "required": true },
+        "listingId": { "type": "string", "required": true },
+        "listingTitle": { "type": "string", "required": true },
+        "businessName": { "type": "string", "required": true },
+        "reporterEmail": { "type": "string", "required": true },
+        "reason": { "type": "string", "required": true },
+        "details": { "type": "string", "required": false },
+        "status": { "type": "string", "required": true },
+        "createdAt": { "type": "timestamp", "required": true }
+      }
+    }
+  }
+}
